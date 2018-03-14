@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/colorFondo"
+    tools:context="com.usach.sebastianvallejos.scapprofesores.Activities.CalendarActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="25dp"
+            android:gravity="center_horizontal"
+            android:textColor="@color/blanco"
+            android:text="@string/Titulo_calendario"/>
+
+        <CalendarView
+            android:id="@+id/calendario"
+            android:layout_marginTop="25dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            android:background="@color/blanco">
+
+        </CalendarView>
+
+        <TextView
+            android:text="@string/Descripcion_calendario"
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:textColor="@color/blanco"
+            android:layout_marginRight="16dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginTop="20dp"
+            android:gravity="center"
+            android:textSize="16dp"
+            />
+
+    </LinearLayout>
+
+</android.support.constraint.ConstraintLayout>

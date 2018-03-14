@@ -1,0 +1,143 @@
+{
+  "project_info": {
+    "project_number": "607831983369",
+    "firebase_url": "https://scap-56b21.firebaseio.com",
+    "project_id": "scap-56b21",
+    "storage_bucket": "scap-56b21.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:607831983369:android:a67c721255c875e3",
+        "android_client_info": {
+          "package_name": "com.usach.sebastianvallejos.scap"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "607831983369-9fk9ba5beg8s5qq4do23t9okkleimes1.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.usach.sebastianvallejos.scap",
+            "certificate_hash": "be9501dfd5c3b65e3fc6cd8bd257e76d84ee8f39"
+          }
+        },
+        {
+          "client_id": "607831983369-53nnqsbhv4u8jm6g9ibkab4f928854u0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDmaB22SxmrgOStZxaivAc6tkrylshHMlg"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "607831983369-53nnqsbhv4u8jm6g9ibkab4f928854u0.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:607831983369:android:245c935766fbc511",
+        "android_client_info": {
+          "package_name": "com.usach.sebastianvallejos.scap_apoderados"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "607831983369-1ia7n71lpu7sqs6n68p44ti8dcmkmlrf.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.usach.sebastianvallejos.scap_apoderados",
+            "certificate_hash": "be9501dfd5c3b65e3fc6cd8bd257e76d84ee8f39"
+          }
+        },
+        {
+          "client_id": "607831983369-53nnqsbhv4u8jm6g9ibkab4f928854u0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDmaB22SxmrgOStZxaivAc6tkrylshHMlg"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "607831983369-53nnqsbhv4u8jm6g9ibkab4f928854u0.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:607831983369:android:11db9fb928e35fd4",
+        "android_client_info": {
+          "package_name": "com.usach.sebastianvallejos.scapprofesores"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "607831983369-da602r6o4q0e7s51vq2gt79vb5labddr.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.usach.sebastianvallejos.scapprofesores",
+            "certificate_hash": "be9501dfd5c3b65e3fc6cd8bd257e76d84ee8f39"
+          }
+        },
+        {
+          "client_id": "607831983369-53nnqsbhv4u8jm6g9ibkab4f928854u0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDmaB22SxmrgOStZxaivAc6tkrylshHMlg"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "607831983369-53nnqsbhv4u8jm6g9ibkab4f928854u0.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
