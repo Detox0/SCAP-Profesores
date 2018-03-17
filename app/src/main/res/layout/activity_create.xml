@@ -18,14 +18,19 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textColor="@color/blanco"
+            android:layout_gravity="center_horizontal"
             android:textSize="25dp"
             android:gravity="center"/>
 
         <TextView
             android:id="@+id/descripcion_crear_actividad"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textColor="@color/blanco"
+            android:gravity="center_horizontal"
+            android:layout_gravity="center_horizontal"
             android:textSize="16dp"
             android:layout_marginTop="10dp"/>
 
@@ -51,6 +56,42 @@
         </Spinner>
 
         <LinearLayout
+            android:id="@+id/layout_cursos_ses"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/desc_curso_Ses"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="16dp"
+                android:layout_marginTop="6dp"
+                android:textColor="@color/blanco"
+                android:gravity="center_horizontal"/>
+
+            <Spinner
+                android:id="@+id/cursos_ses"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="16dp"
+                android:visibility="invisible">
+
+            </Spinner>
+
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/boton_crear_actividad"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="@string/Enviar"/>
+
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical">
@@ -63,16 +104,6 @@
                 android:layout_marginRight="16dp"
                 android:layout_marginBottom="20dp"
                 android:background="@color/blanco" />
-
-            <!-- REVISAR QUE SE VEA EL BOTON -->
-
-            <Button
-                android:id="@+id/boton_crear_actividad"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:text="@string/Aceptar"/>
-
 
         </LinearLayout>
 

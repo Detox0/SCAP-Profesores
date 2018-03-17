@@ -13,19 +13,17 @@ public class Profesores {
     private String apellidoMaterno;
     private String correo;
     private String colegio;
-    private String edad;
 
     //Constructor requerido por FireBase
     public Profesores(){}
 
     //Constructor con asignacion de atributos incluidos
-    public Profesores(String name, String last_namep, String last_namem, String email, String age)
+    public Profesores(String name, String last_namep, String last_namem, String email)
     {
         this.nombre = name;
         this.apellidoPaterno = last_namep;
         this.apellidoMaterno = last_namem;
         this.correo = email;
-        this.edad = age;
 
     }
 
@@ -34,7 +32,6 @@ public class Profesores {
     public String getApellidoPaterno() { return this.apellidoPaterno; }
     public String getApellidoMaterno() { return this.apellidoMaterno; }
     public String getCorreo() { return this.correo; }
-    public String getEdad() { return this.edad; }
     public String getId() { return this.id; }
     public String getColegio() { return this.colegio; }
 
@@ -43,7 +40,6 @@ public class Profesores {
     public void setApellidoPaterno(String apellidoP){this.apellidoPaterno = apellidoP;}
     public void setApellidoMaterno(String apellidoM){this.apellidoMaterno = apellidoM;}
     public void setCorreo(String email){this.correo = email;}
-    public void setEdad(String age){this.edad = age;}
     public void setId(String aidi){ this.id = aidi; }
     public void setColegio(String school) { this.colegio = school; }
 

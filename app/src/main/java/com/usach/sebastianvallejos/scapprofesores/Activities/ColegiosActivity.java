@@ -20,6 +20,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.usach.sebastianvallejos.scapprofesores.R;
 
 import java.lang.reflect.Array;
@@ -56,33 +57,27 @@ public class ColegiosActivity extends AppCompatActivity {
     private void obtenerDatosAnteriores()
     {
         correo = intent.getStringExtra("correo");
-        cargarDatosBD();
+        obtenerColegio();
     }
 
-    private void cargarDatosBD()
+    //Recuperar los colegios registrados en la app
+    private void obtenerColegio()
     {
-        DatabaseReference colegiosRef = mDataBase.getReference("colegios");
+        DatabaseReference colegiosRef = mDataBase.getReference();
 
-        colegiosRef.orderByKey().addChildEventListener(new ChildEventListener() {
+        colegiosRef.child("colegios").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+            public void onDataChange(DataSnapshot dataSnapshot) {
 
-                colegios.add(dataSnapshot.getKey().toString());
-            }
+                for(DataSnapshot data: dataSnapshot.getChildren())
+                {
+                    String cole = data.getKey().toString();
+                    colegios.add(cole);
+                }
 
-            @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-
-            }
-
-            @Override
-            public void onChildRemoved(DataSnapshot dataSnapshot) {
-
-            }
-
-            @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-
+                ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(ColegiosActivity.this, android.R.layout.simple_spinner_item, colegios);
+                arrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                spinnerColegios.setAdapter(arrayAdapter);
             }
 
             @Override
@@ -90,33 +85,6 @@ public class ColegiosActivity extends AppCompatActivity {
 
             }
         });
-
-        rellenarSpinner();
-    }
-
-    //Una vez obtenidos los colegios, se procede a rellenar el spinner con su informacion
-    private void rellenarSpinner()
-    {
-        final ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<String>(
-                this,R.layout.support_simple_spinner_dropdown_item,colegios);
-
-        spinnerArrayAdapter.setDropDownViewResource(R.layout.support_simple_spinner_dropdown_item);
-        spinnerColegios.setAdapter(spinnerArrayAdapter);
-        spinnerArrayAdapter.notifyDataSetChanged();
-
-        spinnerColegios.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> adapterView, View view, int position, long l) {
-                colegio = spinnerColegios.getSelectedItem().toString();
-                Log.i("PRUEBA","TRIGGERED");
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> adapterView) {
-                Log.i("PRUEBA", "Nothing selected");
-            }
-        });
-        Log.i("PRUEBA", "Done");
     }
 
     private void setearListener()
@@ -125,6 +93,8 @@ public class ColegiosActivity extends AppCompatActivity {
         boton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
+                colegio = spinnerColegios.getSelectedItem().toString();
 
                 if(spinnerColegios.getSelectedItem() != null && colegio != null)
                 {

@@ -3,7 +3,9 @@ package com.usach.sebastianvallejos.scapprofesores.Activities;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -16,12 +18,16 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.usach.sebastianvallejos.scapprofesores.Models.Actividad;
 import com.usach.sebastianvallejos.scapprofesores.Models.Profesores;
 import com.usach.sebastianvallejos.scapprofesores.Models.Ses;
 import com.usach.sebastianvallejos.scapprofesores.R;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 public class CreateActivity extends AppCompatActivity {
@@ -29,8 +35,9 @@ public class CreateActivity extends AppCompatActivity {
     //Variables a utilizar
     private FirebaseDatabase mDatabase = FirebaseDatabase.getInstance();
     private List<String> materias = new ArrayList<String>();
+    private List<String> cursos = new ArrayList<String>();
     private Spinner spinnerMaterias;
-    private Profesores profesor;
+    private Profesores profesor = new Profesores();
     private EditText descripcion;
     private Intent intent;
     private String tipo;
@@ -39,6 +46,8 @@ public class CreateActivity extends AppCompatActivity {
     private TextView desc_actividad;
     private String fecha;
     private String id = "";
+    private TextView desc_cursos_ses;
+    private Spinner cursos_ses;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,11 +69,45 @@ public class CreateActivity extends AppCompatActivity {
         //Si la actividad es ses u otra poseen diferentes listeners
         if (tipo.equals("ses"))
         {
+            desc_cursos_ses = (TextView) findViewById(R.id.desc_curso_Ses);
+            cursos_ses = (Spinner) findViewById(R.id.cursos_ses);
+            cursos_ses.setVisibility(View.VISIBLE);
+
+            rellenarVistaSes();
+            obtenerIdSes();
             setearListenerSes();
         }else{
+            obtenerIdActividades();
             setearListenerActividades();
         }
 
+    }
+
+    private void rellenarVistaSes()
+    {
+        desc_cursos_ses.setText("Seleccione el curso donde va a realizar la actividad:");
+
+        DatabaseReference cursosRef = mDatabase.getReference(profesor.getColegio());
+
+        cursosRef.child("profesores/"+profesor.getId()+"/secciones").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                for(DataSnapshot data: dataSnapshot.getChildren())
+                {
+                    String curso = data.getKey().toString();
+                    cursos.add(curso);
+                }
+                //Le entregamos los datos al spinner
+                ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(CreateActivity.this, android.R.layout.simple_spinner_item, cursos);
+                arrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                cursos_ses.setAdapter(arrayAdapter);
+            }
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
     }
 
     private void crearProfesor()
@@ -83,26 +126,19 @@ public class CreateActivity extends AppCompatActivity {
     {
         DatabaseReference materiasRef = mDatabase.getReference(profesor.getColegio());
 
-        materiasRef.child("profesor/"+profesor.getId()+"/materias").addChildEventListener(new ChildEventListener() {
+        materiasRef.child("profesores/"+profesor.getId()+"/materias").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+            public void onDataChange(DataSnapshot dataSnapshot) {
 
-                materias.add(dataSnapshot.getKey().toString());
+                for(DataSnapshot data: dataSnapshot.getChildren())
+                {
+                    String materia = data.getKey().toString();
+                    materias.add(materia);
+                }
 
-            }
-
-            @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-
-            }
-
-            @Override
-            public void onChildRemoved(DataSnapshot dataSnapshot) {
-
-            }
-
-            @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+                ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(CreateActivity.this, android.R.layout.simple_spinner_item, materias);
+                arrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                spinnerMaterias.setAdapter(arrayAdapter);
 
             }
 
@@ -111,12 +147,6 @@ public class CreateActivity extends AppCompatActivity {
 
             }
         });
-
-        final ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<String>(
-                this,R.layout.support_simple_spinner_dropdown_item,materias);
-
-        spinnerArrayAdapter.setDropDownViewResource(R.layout.support_simple_spinner_dropdown_item);
-        spinnerMaterias.setAdapter(spinnerArrayAdapter);
     }
 
     private void setearTitulos()
@@ -153,37 +183,26 @@ public class CreateActivity extends AppCompatActivity {
                 //Revisamos que haya un texto escrito
                 if(descripcion.getText() != null)
                 {
-                    obtenerIdActividades();
+                    DatabaseReference guardarRef = mDatabase.getReference(profesor.getColegio());
 
-                    if(id.equals(""))
-                    {
-                        Toast.makeText(getApplicationContext(),"Ha ocurrido un error inesperado, intente nuevamente.",Toast.LENGTH_LONG);
-                    }
-                    else
-                    {
-                        DatabaseReference guardarRef = mDatabase.getReference(profesor.getColegio());
+                    actividad.setDescripcion(descripcion.getText().toString());
+                    actividad.setFecha(fecha);
+                    actividad.setTipo(tipo);
+                    actividad.setProfesor(profesor.getNombre() + " " + profesor.getApellidoPaterno());
+                    actividad.setMateria(spinnerMaterias.getSelectedItem().toString());
+                    actividad.setSeccion(intent.getStringExtra("seccion"));
 
-                        actividad.setDescripcion(descripcion.getText().toString());
-                        actividad.setFecha(fecha);
-                        actividad.setTipo(tipo);
-                        actividad.setProfesor(profesor.getNombre() + " " + profesor.getApellidoPaterno());
-                        //Verificar esto
-                        //actividad.setMateria();
-                        actividad.setSeccion(intent.getStringExtra("seccion"));
+                    Integer numero = Integer.valueOf(id);
+                    numero++;
+                    id = numero.toString();
 
-                        Integer numero = Integer.valueOf(id);
-                        numero++;
-                        id = numero.toString();
+                    guardarRef.child("fechas").child(id).setValue(actividad);
+                    guardarRef.child("config").child("actividades").setValue(id);
 
-                        guardarRef.child("fechas").child(id).setValue(actividad);
-                        guardarRef.child("config").child("actividades").setValue(id);
+                    Toast.makeText(getApplicationContext(),"Actividad guardada exitosamente.",Toast.LENGTH_SHORT).show();
 
-                        Toast.makeText(getApplicationContext(),"Actividad guardada exitosamente.",Toast.LENGTH_SHORT);
+                    finish();
 
-                        finish();
-
-
-                    }
                 }
                 else
                 {
@@ -195,6 +214,7 @@ public class CreateActivity extends AppCompatActivity {
 
     private void setearListenerSes()
     {
+
         boton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -204,37 +224,37 @@ public class CreateActivity extends AppCompatActivity {
                 //Revisamos que haya un texto escrito
                 if(descripcion.getText() != null)
                 {
-                    obtenerIdSes();
+                    DatabaseReference guardarRef = mDatabase.getReference(profesor.getColegio());
 
-                    if(id.equals(""))
-                    {
-                        Toast.makeText(getApplicationContext(),"Ha ocurrido un error inesperado, intente nuevamente.",Toast.LENGTH_LONG);
-                    }
-                    else
-                    {
-                        DatabaseReference guardarRef = mDatabase.getReference(profesor.getColegio());
+                    actividad.setDescripcion(descripcion.getText().toString());
 
-                        actividad.setDescripcion(descripcion.getText().toString());
-                        actividad.setFecha(fecha);
-                        actividad.setProfesor(profesor.getNombre() + " " + profesor.getApellidoPaterno());
-                        //VERIFICAR ESTO
-                        //actividad.setMateria();
-                        actividad.setSeccion(intent.getStringExtra("seccion"));
-                        actividad.setNegativas("0");
-                        actividad.setPositivas("0");
+                    //Obtenemos la fecha actual
+                    Date tiempo = Calendar.getInstance().getTime();
+                    fecha = new SimpleDateFormat("yyyy/MM/dd").format(tiempo);
+                    actividad.setFecha(fecha);
 
-                        Integer numero = Integer.valueOf(id);
-                        numero++;
-                        id = numero.toString();
+                    actividad.setProfesor(profesor.getNombre() + " " + profesor.getApellidoPaterno());
+                    actividad.setMateria(spinnerMaterias.getSelectedItem().toString());
+                    actividad.setSeccion(cursos_ses.getSelectedItem().toString());
+                    actividad.setNegativas(0);
+                    actividad.setPositivas(0);
 
-                        guardarRef.child("ses").child(id).setValue(actividad);
-                        guardarRef.child("config").child("ses").setValue(id);
+                    Integer numero = Integer.valueOf(id);
+                    numero++;
+                    id = numero.toString();
 
-                        Toast.makeText(getApplicationContext(),"Actividad guardada exitosamente.",Toast.LENGTH_SHORT);
+                    //Se guarda la actividad
+                    guardarRef.child("ses").child(id).setValue(actividad);
+                    //Se guardan las cantidades de actividades actuales en la seccion de configuracion
+                    guardarRef.child("config").child("ses").setValue(id);
+                    //Se guarda en el profesor el ID de la actividad SES
+                    //Aun no funciona
+                    guardarRef.child("profesores/"+profesor.getId()+"/actividadesSES").setValue(id,true);
 
-                        finish();
 
-                    }
+                    Toast.makeText(getApplicationContext(),"Actividad guardada exitosamente.",Toast.LENGTH_SHORT).show();
+
+                    finish();
                 }
                 else
                 {

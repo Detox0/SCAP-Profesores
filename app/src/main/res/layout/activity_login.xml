@@ -68,10 +68,10 @@
             android:id="@+id/fidget_colegio"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:textAlignment="center"
             android:layout_marginTop="16dp"
             android:layout_marginLeft="16dp"
-            android:layout_marginRight="16dp">
-        </Spinner>
+            android:layout_marginRight="16dp"/>
 
         <Button
             android:id="@+id/boton_login"

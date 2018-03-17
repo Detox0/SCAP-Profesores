@@ -3,6 +3,7 @@ package com.usach.sebastianvallejos.scapprofesores.Activities;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -23,9 +24,10 @@ public class SESMenuActivity extends AppCompatActivity {
     //Variables a utilizar
     private FirebaseDatabase mDataBase = FirebaseDatabase.getInstance();
     private Intent intent;
-    private Profesores profesor;
+    private Profesores profesor = new Profesores();
     private LinearLayout layout_ses;
     private ImageButton botonSesNuevo;
+    private String idSes;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,7 +64,8 @@ public class SESMenuActivity extends AppCompatActivity {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
 
-                recuperarActividad(dataSnapshot.getKey().toString());
+                idSes = dataSnapshot.getKey().toString();
+                recuperarActividad();
             }
 
             @Override
@@ -88,17 +91,20 @@ public class SESMenuActivity extends AppCompatActivity {
 
     }
 
-    private void recuperarActividad(String id)
+    private void recuperarActividad()
     {
         DatabaseReference infoSesRef = mDataBase.getReference(profesor.getColegio());
 
         //Ubicamos la actividad y la obtenemos
-        infoSesRef.child("ses/"+id).addChildEventListener(new ChildEventListener() {
+        infoSesRef.child("ses").addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                Ses actividad = dataSnapshot.getValue(Ses.class);
-
-                crearBoton(actividad);
+                if(dataSnapshot.getKey().toString().equals(idSes))
+                {
+                    Ses actividad = dataSnapshot.getValue(Ses.class);
+                    actividad.setId(dataSnapshot.getKey());
+                    crearBoton(actividad);
+                }
             }
 
             @Override
@@ -168,7 +174,7 @@ public class SESMenuActivity extends AppCompatActivity {
             public void onClick(View view) {
 
                 try{
-                    Intent intentSes = new Intent(SESMenuActivity.this, SESDetailActivity.class);
+                    Intent intentSes = new Intent(SESMenuActivity.this, CreateActivity.class);
 
                     //Traspasamos informacion importante para la siguiente vista
                     intentSes.putExtra("nombre",profesor.getNombre());

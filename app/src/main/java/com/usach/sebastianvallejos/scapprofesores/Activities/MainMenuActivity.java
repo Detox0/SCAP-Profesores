@@ -3,6 +3,7 @@ package com.usach.sebastianvallejos.scapprofesores.Activities;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -18,11 +19,11 @@ import com.usach.sebastianvallejos.scapprofesores.R;
 public class MainMenuActivity extends AppCompatActivity {
 
     //Variables a utilizar
-    FirebaseDatabase mDatabase = FirebaseDatabase.getInstance();
-    Intent intent;
-    Profesores profesor;
-    ImageButton botonCalendario;
-    ImageButton botonSes;
+    private FirebaseDatabase mDatabase = FirebaseDatabase.getInstance();
+    private Intent intent;
+    private Profesores profesor = new Profesores();
+    private ImageButton botonCalendario;
+    private ImageButton botonSes;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,11 +54,9 @@ public class MainMenuActivity extends AppCompatActivity {
         profesoresRef.child("profesores").orderByChild("correo").equalTo(correo).addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-
                 profesor = dataSnapshot.getValue(Profesores.class);
-                profesor.setId(dataSnapshot.getKey());
+                profesor.setId(dataSnapshot.getKey().toString());
                 profesor.setColegio(colegio);
-
             }
 
             @Override

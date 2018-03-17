@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.CalendarView;
 
 import com.usach.sebastianvallejos.scapprofesores.Models.Profesores;
@@ -20,6 +21,8 @@ public class CalendarActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_calendar);
+
+        intent = getIntent();
 
         calendario = (CalendarView) findViewById(R.id.calendario);
 
@@ -50,9 +53,20 @@ public class CalendarActivity extends AppCompatActivity {
                 Intent intentActividad = new Intent(CalendarActivity.this,MenuActivity.class);
 
                 //Pasamos informacion a la siguiente vista
-                intentActividad.putExtra("dia",day);
-                intentActividad.putExtra("mes",month);
-                intentActividad.putExtra("ano",year);
+                if(day < 10)
+                {
+                    intentActividad.putExtra("dia","0"+String.valueOf(day));
+                }else{
+                    intentActividad.putExtra("dia",String.valueOf(day));
+                }
+
+                if (month < 10)
+                {
+                    intentActividad.putExtra("mes","0"+String.valueOf(month+1));
+                }else{
+                    intentActividad.putExtra("mes",String.valueOf(month+1));
+                }
+                intentActividad.putExtra("ano",String.valueOf(year));
                 intentActividad.putExtra("nombre",profesor.getNombre());
                 intentActividad.putExtra("apellidoPaterno",profesor.getApellidoPaterno());
                 intentActividad.putExtra("apellidoMaterno",profesor.getApellidoMaterno());

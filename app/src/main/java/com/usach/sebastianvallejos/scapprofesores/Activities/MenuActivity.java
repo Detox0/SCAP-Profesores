@@ -3,7 +3,9 @@ package com.usach.sebastianvallejos.scapprofesores.Activities;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.LinearLayout;
@@ -16,6 +18,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.usach.sebastianvallejos.scapprofesores.Models.Actividad;
 import com.usach.sebastianvallejos.scapprofesores.Models.Profesores;
 import com.usach.sebastianvallejos.scapprofesores.R;
@@ -32,7 +35,7 @@ public class MenuActivity extends AppCompatActivity {
     private Profesores profesor = new Profesores();
     private Intent intent;
     private String fecha;
-    private List<Actividad> actividades = new ArrayList<Actividad>();
+    private Integer actividades;
     private List<String> cursos = new ArrayList<String>();
     private Button boton_tarea;
     private Button boton_materiales;
@@ -40,12 +43,14 @@ public class MenuActivity extends AppCompatActivity {
     private TextView titulo_actividades;
     private LinearLayout layoutActividades;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_menu);
 
         intent = getIntent();
+
         layoutActividades = (LinearLayout) findViewById(R.id.actividades_existentes);
         titulo_actividades = (TextView) findViewById(R.id.titulo_dia_actividades);
         spinner = (Spinner) findViewById(R.id.spinner_cursos);
@@ -53,9 +58,9 @@ public class MenuActivity extends AppCompatActivity {
         boton_materiales = (Button) findViewById(R.id.boton_materiales);
         boton_prueba = (Button) findViewById(R.id.boton_prueba);
 
-        crearProfesor();
+
         obtenerFecha();
-        obtenerCursos();
+        crearProfesor();
         accionBotonTarea();
         accionBotonMateriales();
         accionBotonPrueba();
@@ -70,6 +75,7 @@ public class MenuActivity extends AppCompatActivity {
         profesor.setCorreo(intent.getStringExtra("correo"));
         profesor.setApellidoMaterno(intent.getStringExtra("apellidoMaterno"));
         profesor.setApellidoPaterno(intent.getStringExtra("apellidoPaterno"));
+        obtenerCursos();
     }
 
     //Funcion que recupera la fecha y la de formato
@@ -84,29 +90,40 @@ public class MenuActivity extends AppCompatActivity {
         fecha = ano + "/" + mes + "/" + dia;
     }
 
+    //Funcion que busca los cursos del profesor actual
     private void obtenerCursos()
     {
         DatabaseReference cursosRef = mDatabase.getReference(profesor.getColegio());
 
-        cursosRef.child("profesores/"+profesor.getId()+"/cursos").addChildEventListener(new ChildEventListener() {
+        cursosRef.child("profesores/"+profesor.getId()+"/secciones").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                cursos.add(dataSnapshot.getKey());
-            }
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for(DataSnapshot data: dataSnapshot.getChildren())
+                {
+                    String curso = data.getKey().toString();
+                    cursos.add(curso);
+                }
 
-            @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                //Le entregamos los datos al spinner
+                ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(MenuActivity.this, android.R.layout.simple_spinner_item, cursos);
+                arrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                spinner.setAdapter(arrayAdapter);
 
-            }
+                //Accion para que cuando se cambie el curso se haga nuevamente la consulta
+                spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                    @Override
+                    public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                        //Limpiar la vista
+                        limpiarActividades();
+                    }
 
-            @Override
-            public void onChildRemoved(DataSnapshot dataSnapshot) {
+                    @Override
+                    public void onNothingSelected(AdapterView<?> adapterView) {
 
-            }
+                    }
+                });
 
-            @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-
+                obtenerActividades();
             }
 
             @Override
@@ -114,134 +131,144 @@ public class MenuActivity extends AppCompatActivity {
 
             }
         });
-
-        //Ahora con los datos necesarios rellenamos spinner
-        rellenarSpinner();
     }
 
-    private void rellenarSpinner()
-    {
-        final ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<String>(
-                this,R.layout.support_simple_spinner_dropdown_item,cursos);
-
-        spinnerArrayAdapter.setDropDownViewResource(R.layout.support_simple_spinner_dropdown_item);
-        spinner.setAdapter(spinnerArrayAdapter);
-    }
-
+    //Agregamos un listener al boton tarea
     private void accionBotonTarea()
     {
-        //verificamos que se ha seleccionado un curso
-        //VERIFICAR
-        if(spinner.getSelectedItem() != null)
-        {
-            Intent intentTarea = new Intent(MenuActivity.this,DetailActivity.class);
+        boton_tarea.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                //verificamos que se ha seleccionado un curso
+                if(spinner.getSelectedItem() != null)
+                {
+                    Intent intentTarea = new Intent(MenuActivity.this,CreateActivity.class);
 
-            //Pasamos informacion a la siguiente vista
-            intentTarea.putExtra("fecha",fecha);
-            intentTarea.putExtra("nombre",profesor.getNombre());
-            intentTarea.putExtra("apellidoPaterno",profesor.getApellidoPaterno());
-            intentTarea.putExtra("apellidoMaterno",profesor.getApellidoMaterno());
-            intentTarea.putExtra("correo",profesor.getCorreo());
-            intentTarea.putExtra("id",profesor.getId());
-            intentTarea.putExtra("colegio",profesor.getColegio());
-            intentTarea.putExtra("tipo","Tarea");
-            intentTarea.putExtra("seccion",spinner.getSelectedItem().toString());
+                    //Pasamos informacion a la siguiente vista
+                    intentTarea.putExtra("fecha",fecha);
+                    intentTarea.putExtra("nombre",profesor.getNombre());
+                    intentTarea.putExtra("apellidoPaterno",profesor.getApellidoPaterno());
+                    intentTarea.putExtra("apellidoMaterno",profesor.getApellidoMaterno());
+                    intentTarea.putExtra("correo",profesor.getCorreo());
+                    intentTarea.putExtra("id",profesor.getId());
+                    intentTarea.putExtra("colegio",profesor.getColegio());
+                    intentTarea.putExtra("tipo","Tarea");
+                    intentTarea.putExtra("seccion",spinner.getSelectedItem().toString());
 
-            startActivity(intentTarea);
-        }
-        else
-        {
-            Toast.makeText(getApplicationContext(), "No se ha seleccionado curso, profavor seleccione un e intente nuevamente.", Toast.LENGTH_LONG).show();
+                    startActivity(intentTarea);
+                }
+                else
+                {
+                    Toast.makeText(getApplicationContext(), "No se ha seleccionado curso, profavor seleccione un e intente nuevamente.", Toast.LENGTH_LONG).show();
 
-        }
+                }
+            }
+        });
     }
 
+    //Agregamos un listener al boton materiales
     private void accionBotonMateriales()
     {
-        //verificamos que se ha seleccionado un curso
-        //VERIFICAR
-        if(spinner.getSelectedItem() != null)
-        {
-            Intent intentMateriales = new Intent(MenuActivity.this,DetailActivity.class);
+        boton_materiales.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                //verificamos que se ha seleccionado un curso
+                if(spinner.getSelectedItem() != null)
+                {
+                    Intent intentMateriales = new Intent(MenuActivity.this,CreateActivity.class);
 
-            //Pasamos informacion a la siguiente vista
-            intentMateriales.putExtra("fecha",fecha);
-            intentMateriales.putExtra("nombre",profesor.getNombre());
-            intentMateriales.putExtra("apellidoPaterno",profesor.getApellidoPaterno());
-            intentMateriales.putExtra("apellidoMaterno",profesor.getApellidoMaterno());
-            intentMateriales.putExtra("correo",profesor.getCorreo());
-            intentMateriales.putExtra("id",profesor.getId());
-            intentMateriales.putExtra("colegio",profesor.getColegio());
-            intentMateriales.putExtra("tipo","Materiales");
+                    //Pasamos informacion a la siguiente vista
+                    intentMateriales.putExtra("fecha",fecha);
+                    intentMateriales.putExtra("nombre",profesor.getNombre());
+                    intentMateriales.putExtra("apellidoPaterno",profesor.getApellidoPaterno());
+                    intentMateriales.putExtra("apellidoMaterno",profesor.getApellidoMaterno());
+                    intentMateriales.putExtra("correo",profesor.getCorreo());
+                    intentMateriales.putExtra("id",profesor.getId());
+                    intentMateriales.putExtra("colegio",profesor.getColegio());
+                    intentMateriales.putExtra("tipo","Materiales");
+                    intentMateriales.putExtra("seccion",spinner.getSelectedItem().toString());
 
-            startActivity(intentMateriales);
-        }
-        else
-        {
-            Toast.makeText(getApplicationContext(), "No se ha seleccionado curso, profavor seleccione un e intente nuevamente.", Toast.LENGTH_LONG).show();
+                    startActivity(intentMateriales);
+                }
+                else
+                {
+                    Toast.makeText(getApplicationContext(), "No se ha seleccionado curso, profavor seleccione un e intente nuevamente.", Toast.LENGTH_LONG).show();
 
-        }
+                }
+            }
+        });
     }
 
+    //Agregamos un listener al boton prueba
     private void accionBotonPrueba()
     {
-        //verificamos que se ha seleccionado un curso
-        //VERIFICAR
-        if(spinner.getSelectedItem() != null)
-        {
-            Intent intentPrueba = new Intent(MenuActivity.this,DetailActivity.class);
+        boton_prueba.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                //verificamos que se ha seleccionado un curso
+                if(spinner.getSelectedItem() != null)
+                {
+                    Intent intentPrueba = new Intent(MenuActivity.this,CreateActivity.class);
 
-            //Pasamos informacion a la siguiente vista
-            intentPrueba.putExtra("fecha",fecha);
-            intentPrueba.putExtra("nombre",profesor.getNombre());
-            intentPrueba.putExtra("apellidoPaterno",profesor.getApellidoPaterno());
-            intentPrueba.putExtra("apellidoMaterno",profesor.getApellidoMaterno());
-            intentPrueba.putExtra("correo",profesor.getCorreo());
-            intentPrueba.putExtra("id",profesor.getId());
-            intentPrueba.putExtra("colegio",profesor.getColegio());
-            intentPrueba.putExtra("tipo","Prueba");
+                    //Pasamos informacion a la siguiente vista
+                    intentPrueba.putExtra("fecha",fecha);
+                    intentPrueba.putExtra("nombre",profesor.getNombre());
+                    intentPrueba.putExtra("apellidoPaterno",profesor.getApellidoPaterno());
+                    intentPrueba.putExtra("apellidoMaterno",profesor.getApellidoMaterno());
+                    intentPrueba.putExtra("correo",profesor.getCorreo());
+                    intentPrueba.putExtra("id",profesor.getId());
+                    intentPrueba.putExtra("colegio",profesor.getColegio());
+                    intentPrueba.putExtra("tipo","Prueba");
+                    intentPrueba.putExtra("seccion",spinner.getSelectedItem().toString());
 
-            startActivity(intentPrueba);
-        }
-        else
-        {
-            Toast.makeText(getApplicationContext(), "No se ha seleccionado curso, profavor seleccione un e intente nuevamente.", Toast.LENGTH_LONG).show();
+                    startActivity(intentPrueba);
+                }
+                else
+                {
+                    Toast.makeText(getApplicationContext(), "No se ha seleccionado curso, porfavor seleccione uno e intente nuevamente.", Toast.LENGTH_LONG).show();
 
-        }
+                }
+            }
+        });
     }
 
     //Obtenemos las actividades de un dia y curso especificos
     private void obtenerActividades()
     {
+        actividades = 0;
+
         DatabaseReference actividadesRef = mDatabase.getReference(profesor.getColegio());
 
-        actividadesRef.orderByChild("fechas").equalTo(fecha).addChildEventListener(new ChildEventListener() {
+        actividadesRef.child("fechas").orderByChild("fecha").equalTo(fecha).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+            public void onDataChange(DataSnapshot dataSnapshot) {
 
-                //Actividad correspondiente a ese dia
-                Actividad activity = dataSnapshot.getValue(Actividad.class);
-
-                //Si la actividad no corresponde con el curso actual, no se agrega
-                if(activity.getSeccion().equals(spinner.getSelectedItem().toString()))
+                for(DataSnapshot data : dataSnapshot.getChildren())
                 {
-                    actividades.add(activity);
+                    //Actividad correspondiente a ese dia
+                    Actividad activity = data.getValue(Actividad.class);
+
+                    Log.i("PRUEBA","La seccion es: "+activity.getSeccion());
+                    Log.i("PRUEBA","El spinner tiene: "+spinner.getSelectedItem().toString());
+
+                    if(activity.getSeccion() != null && spinner.getSelectedItem() != null)
+                    {
+                        //Si la actividad no corresponde con el curso actual, no se agrega
+                        if(activity.getSeccion().equals(spinner.getSelectedItem().toString()))
+                        {
+                            colocarActividades(activity);
+                            actividades++;
+                        }
+                    }
+
+
                 }
-            }
 
-            @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-
-            }
-
-            @Override
-            public void onChildRemoved(DataSnapshot dataSnapshot) {
-
-            }
-
-            @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-
+                //Si existen actividades las agregamos, en caso contrario mostramos un mensaje de que no hay
+                if(actividades == 0)
+                {
+                    titulo_actividades.setText("No existen actividades para este curso este dia.");
+                }
             }
 
             @Override
@@ -250,36 +277,25 @@ public class MenuActivity extends AppCompatActivity {
             }
         });
 
-        //Si existen actividades las agregamos, en caso contrario mostramos un mensaje de que no hay
-        if(actividades.size() != 0)
-        {
-            colocarActividades();
-        }
-        else
-        {
-            titulo_actividades.setText("No existen actividades para este curso este dia.");
-        }
     }
 
     //Se colocan las actividades para cierto dia en cierto curso
-    private void colocarActividades()
+    private void colocarActividades(Actividad actividad)
     {
         titulo_actividades.setText("Las actividades para este curso, este dia son:");
 
-        for(int i=0; i<actividades.size(); i++)
-        {
-            //Parametros necesarios para colocar los elementos nuevso en la vista
-            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.MATCH_PARENT,
-                    LinearLayout.LayoutParams.WRAP_CONTENT
-            );
+        //Parametros necesarios para colocar los elementos nuevso en la vista
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+        );
 
-            //Se crea el boton y se le asigna un Listener
-            Button botonVista = new Button(this);
-            botonVista.setText(actividades.get(i).getTipo());
-            setearListener(botonVista,actividades.get(i));
-            layoutActividades.addView(botonVista,params);
-        }
+        //Se crea el boton y se le asigna un Listener
+        Button botonVista = new Button(this);
+        botonVista.setText(actividad.getTipo());
+        setearListener(botonVista,actividad);
+        layoutActividades.addView(botonVista,params);
+
     }
 
     //Le agregamos un listener a cada boton creado
@@ -293,6 +309,7 @@ public class MenuActivity extends AppCompatActivity {
 
                 intentDetalle.putExtra("tipo",activity.getTipo());
                 intentDetalle.putExtra("fecha",fecha);
+                intentDetalle.putExtra("materia",activity.getMateria());
                 intentDetalle.putExtra("descripcion",activity.getDescripcion());
                 intentDetalle.putExtra("profesor",activity.getProfesor());
 
@@ -300,6 +317,18 @@ public class MenuActivity extends AppCompatActivity {
             }
         });
 
+    }
+
+    //Limpia la vista para que se vean las nuevas actividades
+    private void limpiarActividades()
+    {
+        //Si el layout presenta mas de un boton, se borra
+        if (layoutActividades.getChildCount() > 0 )
+        {
+            layoutActividades.removeAllViews();
+        }
+        //Entregar las nuevas actividades
+        obtenerActividades();
     }
 
 }

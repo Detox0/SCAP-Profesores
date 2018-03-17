@@ -22,6 +22,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.usach.sebastianvallejos.scapprofesores.Models.Profesores;
 import com.usach.sebastianvallejos.scapprofesores.R;
 
@@ -60,28 +61,21 @@ public class LoginActivity extends AppCompatActivity{
     //Recuperar los colegios registrados en la app
     private void obtenerColegio()
     {
-        DatabaseReference colegiosRef = mDataBase.getReference("colegios");
+        DatabaseReference colegiosRef = mDataBase.getReference();
 
-        colegiosRef.orderByKey().addChildEventListener(new ChildEventListener() {
+        colegiosRef.child("colegios").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+            public void onDataChange(DataSnapshot dataSnapshot) {
 
-                colegios.add(dataSnapshot.getKey().toString());
-            }
+                for(DataSnapshot data: dataSnapshot.getChildren())
+                {
+                    String cole = data.getKey().toString();
+                    colegios.add(cole);
+                }
 
-            @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-
-            }
-
-            @Override
-            public void onChildRemoved(DataSnapshot dataSnapshot) {
-
-            }
-
-            @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-
+                ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(LoginActivity.this, android.R.layout.simple_spinner_item, colegios);
+                arrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                spinnerColegios.setAdapter(arrayAdapter);
             }
 
             @Override
@@ -89,37 +83,6 @@ public class LoginActivity extends AppCompatActivity{
 
             }
         });
-
-        rellenarSpinner();
-    }
-
-    //Una vez obtenidos los colegios, se procede a rellenar el spinner con su informacion
-    private void rellenarSpinner()
-    {
-        final ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<String>(
-                this,R.layout.support_simple_spinner_dropdown_item,colegios);
-
-        spinnerArrayAdapter.setDropDownViewResource(R.layout.support_simple_spinner_dropdown_item);
-        this.spinnerColegios.setAdapter(spinnerArrayAdapter);
-
-        //spinnerArrayAdapter.notifyDataSetChanged();
-
-        /*this.spinnerColegios.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> adapterView, View view, int position, long l) {
-                //Log.i("PRUEBA",colegio);
-                // colegio = adapterView.getItemAtPosition(position).toString();
-                Log.i("PRUEBA","TRIGGERED");
-                //colegio = spinnerColegios.getSelectedItem().toString();
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> adapterView) {
-                Log.i("PRUEBA", "Nothing selected");
-            }
-        });*/
-
-        Log.i("PRUEBA", "Done");
     }
 
     //Verificamos si el usuario se encuentra con la sesion iniciada o no
@@ -172,8 +135,6 @@ public class LoginActivity extends AppCompatActivity{
                 correo = recuperarCorreo();
                 contrasena = recuperarContrasena();
 
-                Log.i("PRUEBA","El spinner tiene: "+spinnerColegios.getCount());
-
                 if (spinnerColegios.getSelectedItem() != null)
                 {
                     mAuth.signInWithEmailAndPassword(correo,contrasena)
@@ -183,14 +144,13 @@ public class LoginActivity extends AppCompatActivity{
 
                                     if(task.isSuccessful())
                                     {
-                                        Log.i("PRUEBA","LOGEA CORRECTAMENTE");
                                         Intent intent = new Intent(LoginActivity.this, MainMenuActivity.class);
 
                                         intent.putExtra("correo",correo);
 
                                         intent.putExtra("colegio",colegio);
 
-                                        //startActivity(intent);
+                                        startActivity(intent);
                                     }
                                     else
                                     {
@@ -203,7 +163,7 @@ public class LoginActivity extends AppCompatActivity{
                             });
                 }
                 else{
-                    Toast.makeText(LoginActivity.this,"No se ha seleccionado un colegio, porfavor seleccione uno.", Toast.LENGTH_LONG);
+                    Toast.makeText(LoginActivity.this,"No se ha seleccionado un colegio, porfavor seleccione uno.", Toast.LENGTH_LONG).show();
                     Log.i("PRUEBA","No se ha seleccionado un colegio, porfavor seleccione uno.");
                 }
 

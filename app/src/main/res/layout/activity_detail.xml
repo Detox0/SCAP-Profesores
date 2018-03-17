@@ -18,6 +18,10 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textColor="@color/blanco"
+            android:gravity="center_horizontal"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            android:layout_marginTop="6dp"
             android:textSize="25dp"/>
 
         <TextView
@@ -25,6 +29,9 @@
             android:id="@+id/descripcion_detalle_actividad"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
             android:textColor="@color/blanco"
             android:textSize="16dp"/>
 

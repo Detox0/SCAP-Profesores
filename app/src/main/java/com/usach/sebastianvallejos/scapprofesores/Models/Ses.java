@@ -10,13 +10,13 @@ public class Ses {
     private String descripcion;
     private String fecha;
     private String seccion;
-    private String positivas;
-    private String negativas;
+    private long positivas;
+    private long negativas;
     private String materia;
 
     public Ses(){}
 
-    public Ses(String aidi, String teacher , String desc, String date, String section, String positive, String negative, String subject)
+    public Ses(String aidi, String teacher , String desc, String date, String section, long positive, long negative, String subject)
     {
         this.id = aidi;
         this.profesor = teacher;
@@ -32,8 +32,8 @@ public class Ses {
     public String getId(){ return this.id; }
     public String getFecha() {return fecha;}
     public String getSeccion() {return seccion;}
-    public String getNegativas() {return negativas;}
-    public String getPositivas() {return positivas;}
+    public long getNegativas() {return negativas;}
+    public long getPositivas() {return positivas;}
     public String getProfesor(){ return this.profesor; }
     public String getDescripcion() {return descripcion;}
     public String getMateria() {return materia;}
@@ -44,7 +44,7 @@ public class Ses {
     public void setFecha(String fecha) {this.fecha = fecha;}
     public void setProfesor(String profesor) {this.profesor = profesor;}
     public void setSeccion(String seccion) {this.seccion = seccion;}
-    public void setPositivas(String positivas) {this.positivas = positivas;}
-    public void setNegativas(String negativas) {this.negativas = negativas;}
+    public void setPositivas(long positivas) {this.positivas = positivas;}
+    public void setNegativas(long negativas) {this.negativas = negativas;}
     public void setMateria(String materia) {this.materia = materia;}
 }
