@@ -248,8 +248,8 @@ public class CreateActivity extends AppCompatActivity {
                     //Se guardan las cantidades de actividades actuales en la seccion de configuracion
                     guardarRef.child("config").child("ses").setValue(id);
                     //Se guarda en el profesor el ID de la actividad SES
-                    //Aun no funciona
-                    guardarRef.child("profesores/"+profesor.getId()+"/actividadesSES").setValue(id,true);
+                    //REVISAR
+                    guardarRef.child("profesores/"+profesor.getId()+"/actividadesSES/").setValue(id,true);
 
 
                     Toast.makeText(getApplicationContext(),"Actividad guardada exitosamente.",Toast.LENGTH_SHORT).show();
@@ -309,6 +309,7 @@ public class CreateActivity extends AppCompatActivity {
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 if(dataSnapshot.getKey().toString().equals("ses"))
                 {
+
                     id = dataSnapshot.getValue().toString();
                 }
             }
