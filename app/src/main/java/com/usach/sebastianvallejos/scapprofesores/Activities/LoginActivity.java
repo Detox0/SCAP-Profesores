@@ -33,8 +33,9 @@ public class LoginActivity extends AppCompatActivity{
 
     //Definicion de variables
     private String correo;
-    private String colegio="caca";
+    private String colegio="Ninguno";
     private String contrasena;
+    private Boolean profesor_registrado = false;
     private FirebaseAuth mAuth;
     private Spinner spinnerColegios;
     private Button botonLogin;
@@ -50,12 +51,13 @@ public class LoginActivity extends AppCompatActivity{
         mAuth = FirebaseAuth.getInstance();
         spinnerColegios = (Spinner) findViewById(R.id.fidget_colegio);
         botonLogin = (Button) findViewById(R.id.boton_login);
-
         //Llamamos a los colegios registrados en la app
         obtenerColegio();
 
-        //Ahora que tenemos lo necesario para poder iniciar sesion, comenzamos la activity
+        //Ahora que tenemos lo necesario para poder iniciar sesion, comenzamos la activity verificando si ya existe un usuario
         inicio();
+        //En caso contrario, se crea el boton para iniciar la actividad
+        crearBoton();
     }
 
     //Recuperar los colegios registrados en la app
@@ -89,32 +91,22 @@ public class LoginActivity extends AppCompatActivity{
     private void inicio()
     {
         FirebaseUser usuario = mAuth.getCurrentUser();
-
         //En el caso de haber iniciado sesion, se continua inmediatamente a la siguiente activity
         if(usuario != null)
         {
-            Log.i("PRUEBA","HA INICIADO SESION PREVIAMENTE");
             correo = usuario.getEmail();
-
             Intent intent = new Intent(LoginActivity.this, ColegiosActivity.class);
-
             intent.putExtra("correo",correo);
-
             //Aca puede ir un intent que nos pregunte por el colegio
             startActivity(intent);
         }
-        else{//En caso contrario se le pide que inicie sesion
-            Log.i("PRUEBA","NO HA INICIADO SESION PREVIAMENTE");
-            crearBoton();
-        }
-
     }
 
     //Funcion encargada de recuperar el correo del usuario
     private String recuperarCorreo()
     {
         EditText campoCorreo = (EditText) findViewById(R.id.correo_usuario);
-        return campoCorreo.getText().toString();
+        return campoCorreo.getText().toString().toLowerCase().replaceAll("\\s+", "");
 
     }
 
@@ -141,15 +133,13 @@ public class LoginActivity extends AppCompatActivity{
                             .addOnCompleteListener(LoginActivity.this, new OnCompleteListener<AuthResult>() {
                                 @Override
                                 public void onComplete(@NonNull Task<AuthResult> task) {
-
-                                    if(task.isSuccessful())
+                                    verificarProfesor();
+                                    colegio = spinnerColegios.getSelectedItem().toString();
+                                    if(task.isSuccessful() && profesor_registrado)
                                     {
                                         Intent intent = new Intent(LoginActivity.this, MainMenuActivity.class);
-
                                         intent.putExtra("correo",correo);
-
                                         intent.putExtra("colegio",colegio);
-
                                         startActivity(intent);
                                     }
                                     else
@@ -174,39 +164,18 @@ public class LoginActivity extends AppCompatActivity{
 
     //Verificamos que el profesor pertenece al colegio en cuestion
     //Funcion que verifica que un profesor se encuentra registrado en un colegio
-    private Boolean verificarProfesor()
+    private void verificarProfesor()
     {
         DatabaseReference profesoresRef = mDataBase.getReference(colegio);
-
-        profesoresRef.child("profesores").orderByChild("correo").equalTo(correo).addChildEventListener(new ChildEventListener() {
+        profesoresRef.child("profesores").orderByChild("correo").equalTo(correo).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-
-                profesor = dataSnapshot.getValue(Profesores.class);
-
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                profesor_registrado = true;
             }
-
-            @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-
-            }
-
-            @Override
-            public void onChildRemoved(DataSnapshot dataSnapshot) {
-
-            }
-
-            @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-
-            }
-
             @Override
             public void onCancelled(DatabaseError databaseError) {
 
             }
         });
-        return false;
     }
-
 }

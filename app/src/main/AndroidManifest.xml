@@ -12,7 +12,6 @@
         <activity android:name=".Activities.LoginActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -23,7 +22,24 @@
         <activity android:name=".Activities.CreateActivity" />
         <activity android:name=".Activities.SESMenuActivity" />
         <activity android:name=".Activities.SESDetailActivity" />
-        <activity android:name=".Activities.ColegiosActivity"></activity>
+        <activity android:name=".Activities.ColegiosActivity" />
+        <activity android:name=".Activities.AnswersActivity" />
+        <activity android:name=".Activities.DetailAnswerActivity"></activity>
+
+        <service
+            android:name=".MyFirebaseMessagingService">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT"/>
+            </intent-filter>
+        </service>
+
+        <service
+            android:name=".MyFirebaseInstanceIDService">
+            <intent-filter>
+                <action android:name="com.google.firebase.INSTANCE_ID_EVENT"/>
+            </intent-filter>
+        </service>
+
     </application>
 
 </manifest>

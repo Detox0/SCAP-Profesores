@@ -6,5 +6,6 @@
     <color name="colorFondo">#2E64FE</color>
     <color name="blanco">#FFFFFF</color>
     <color name="verde">#31C021</color>
-    <color name="rojo">#FF4000</color>
+    <color name="rojo">#f26d41</color>
+    <color name="amarillo">#FFFF00</color>
 </resources>

@@ -236,21 +236,14 @@ public class MenuActivity extends AppCompatActivity {
     private void obtenerActividades()
     {
         actividades = 0;
-
         DatabaseReference actividadesRef = mDatabase.getReference(profesor.getColegio());
-
         actividadesRef.child("fechas").orderByChild("fecha").equalTo(fecha).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-
                 for(DataSnapshot data : dataSnapshot.getChildren())
                 {
                     //Actividad correspondiente a ese dia
                     Actividad activity = data.getValue(Actividad.class);
-
-                    Log.i("PRUEBA","La seccion es: "+activity.getSeccion());
-                    Log.i("PRUEBA","El spinner tiene: "+spinner.getSelectedItem().toString());
-
                     if(activity.getSeccion() != null && spinner.getSelectedItem() != null)
                     {
                         //Si la actividad no corresponde con el curso actual, no se agrega
@@ -260,17 +253,13 @@ public class MenuActivity extends AppCompatActivity {
                             actividades++;
                         }
                     }
-
-
                 }
-
                 //Si existen actividades las agregamos, en caso contrario mostramos un mensaje de que no hay
                 if(actividades == 0)
                 {
                     titulo_actividades.setText("No existen actividades para este curso este dia.");
                 }
             }
-
             @Override
             public void onCancelled(DatabaseError databaseError) {
 

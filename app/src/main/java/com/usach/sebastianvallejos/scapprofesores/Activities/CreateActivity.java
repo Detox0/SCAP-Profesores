@@ -214,46 +214,42 @@ public class CreateActivity extends AppCompatActivity {
 
     private void setearListenerSes()
     {
-
         boton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
                 Ses actividad = new Ses();
-
                 //Revisamos que haya un texto escrito
                 if(descripcion.getText() != null)
                 {
                     DatabaseReference guardarRef = mDatabase.getReference(profesor.getColegio());
-
                     actividad.setDescripcion(descripcion.getText().toString());
-
                     //Obtenemos la fecha actual
                     Date tiempo = Calendar.getInstance().getTime();
                     fecha = new SimpleDateFormat("yyyy/MM/dd").format(tiempo);
                     actividad.setFecha(fecha);
-
                     actividad.setProfesor(profesor.getNombre() + " " + profesor.getApellidoPaterno());
                     actividad.setMateria(spinnerMaterias.getSelectedItem().toString());
                     actividad.setSeccion(cursos_ses.getSelectedItem().toString());
-                    actividad.setNegativas(0);
-                    actividad.setPositivas(0);
-
+                    actividad.setFaciles(0);
+                    actividad.setNormales(0);
+                    actividad.setDificiles(0);
+                    actividad.setMenos(0);
+                    actividad.setEntre(0);
+                    actividad.setMas(0);
+                    actividad.setEntusiasmado(0);
+                    actividad.setDesinteresado(0);
+                    actividad.setAburrido(0);
                     Integer numero = Integer.valueOf(id);
                     numero++;
                     id = numero.toString();
-
                     //Se guarda la actividad
                     guardarRef.child("ses").child(id).setValue(actividad);
                     //Se guardan las cantidades de actividades actuales en la seccion de configuracion
                     guardarRef.child("config").child("ses").setValue(id);
                     //Se guarda en el profesor el ID de la actividad SES
-                    //REVISAR
-                    guardarRef.child("profesores/"+profesor.getId()+"/actividadesSES/").setValue(id,true);
-
-
+                    //guardarRef.child("profesores/"+profesor.getId()+"/actividadesSES/").setValue(id,true);
+                    guardarRef.child("profesores/"+profesor.getId()+"/actividadesSES/").push().setValue(id);
                     Toast.makeText(getApplicationContext(),"Actividad guardada exitosamente.",Toast.LENGTH_SHORT).show();
-
                     finish();
                 }
                 else

@@ -67,6 +67,14 @@
           }
         },
         {
+          "client_id": "607831983369-pj3v4o15qo74rasdv9chv8fnoebvn0qc.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.usach.sebastianvallejos.scap_apoderados",
+            "certificate_hash": "9d9187c8f320a75b62855256c573e6d7832d6ec8"
+          }
+        },
+        {
           "client_id": "607831983369-53nnqsbhv4u8jm6g9ibkab4f928854u0.apps.googleusercontent.com",
           "client_type": 3
         }

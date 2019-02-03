@@ -15,6 +15,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.usach.sebastianvallejos.scapprofesores.Models.Profesores;
 import com.usach.sebastianvallejos.scapprofesores.Models.Ses;
 import com.usach.sebastianvallejos.scapprofesores.R;
@@ -46,6 +47,7 @@ public class SESMenuActivity extends AppCompatActivity {
     //Funcion encargada de recuperar los datos anteriores y crear un profesor
     private void crearProfesor()
     {
+        Log.i("COLEGIO: ", intent.getStringExtra("colegio"));
         profesor.setColegio(intent.getStringExtra("colegio"));
         profesor.setId(intent.getStringExtra("id"));
         profesor.setNombre(intent.getStringExtra("nombre"));
@@ -64,7 +66,7 @@ public class SESMenuActivity extends AppCompatActivity {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
 
-                idSes = dataSnapshot.getKey().toString();
+                idSes = dataSnapshot.getValue().toString();
                 recuperarActividad();
             }
 
@@ -96,7 +98,7 @@ public class SESMenuActivity extends AppCompatActivity {
         DatabaseReference infoSesRef = mDataBase.getReference(profesor.getColegio());
 
         //Ubicamos la actividad y la obtenemos
-        infoSesRef.child("ses").addChildEventListener(new ChildEventListener() {
+        /*infoSesRef.child("ses").addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 if(dataSnapshot.getKey().toString().equals(idSes))
@@ -126,17 +128,30 @@ public class SESMenuActivity extends AppCompatActivity {
             public void onCancelled(DatabaseError databaseError) {
 
             }
+        });*/
+
+        infoSesRef.child("ses").child(idSes).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Ses actividad = dataSnapshot.getValue(Ses.class);
+                actividad.setId(dataSnapshot.getKey());
+                crearBoton(actividad);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
         });
     }
 
     private void crearBoton(Ses actividad)
     {
-        //Parametros necesarios para colocar los elementos nuevso en la vista
+        //Parametros necesarios para colocar los elementos nuevos en la vista
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
         );
-
         //Se crea el boton y se le asigna un Listener
         Button botonVista = new Button(this);
         botonVista.setText(actividad.getMateria());
@@ -151,12 +166,18 @@ public class SESMenuActivity extends AppCompatActivity {
             public void onClick(View view) {
 
                 try{
-
                     Intent intentSes = new Intent(SESMenuActivity.this, SESDetailActivity.class);
-
-                    intentSes.putExtra("positivos",actividad.getPositivas());
-                    intentSes.putExtra("negativos",actividad.getNegativas());
-
+                    intentSes.putExtra("id", actividad.getId());
+                    intentSes.putExtra("faciles",String.valueOf(actividad.getFaciles()));
+                    intentSes.putExtra("normales",String.valueOf(actividad.getNormales()));
+                    intentSes.putExtra("dificiles",String.valueOf(actividad.getDificiles()));
+                    intentSes.putExtra("menos",String.valueOf(actividad.getMenos()));
+                    intentSes.putExtra("entre",String.valueOf(actividad.getEntre()));
+                    intentSes.putExtra("mas",String.valueOf(actividad.getMas()));
+                    intentSes.putExtra("entusiasmado",String.valueOf(actividad.getEntusiasmado()));
+                    intentSes.putExtra("desinteresado",String.valueOf(actividad.getDesinteresado()));
+                    intentSes.putExtra("aburrido",String.valueOf(actividad.getAburrido()));
+                    intentSes.putExtra("colegio", profesor.getColegio());
                     startActivity(intentSes);
                 }
                 catch(Exception e) {

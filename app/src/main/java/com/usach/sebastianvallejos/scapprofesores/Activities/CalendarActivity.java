@@ -51,7 +51,6 @@ public class CalendarActivity extends AppCompatActivity {
 
                 //creamos el intent para la siguiente vista
                 Intent intentActividad = new Intent(CalendarActivity.this,MenuActivity.class);
-
                 //Pasamos informacion a la siguiente vista
                 if(day < 10)
                 {
@@ -59,7 +58,6 @@ public class CalendarActivity extends AppCompatActivity {
                 }else{
                     intentActividad.putExtra("dia",String.valueOf(day));
                 }
-
                 if (month < 10)
                 {
                     intentActividad.putExtra("mes","0"+String.valueOf(month+1));
@@ -73,7 +71,6 @@ public class CalendarActivity extends AppCompatActivity {
                 intentActividad.putExtra("correo",profesor.getCorreo());
                 intentActividad.putExtra("id",profesor.getId());
                 intentActividad.putExtra("colegio",profesor.getColegio());
-
                 startActivity(intentActividad);
             }
         });
