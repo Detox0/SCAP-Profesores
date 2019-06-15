@@ -41,7 +41,7 @@
     <string name="Boton_descripcion_SES">Ver detalles</string>
     <string name="Acividades_Header">Respuestas de los Apoderados</string>
     <string name="Descripcion_detalle_respuesta">Detalles de la respuesta</string>
-    <string name="Nombre_apoderado">Nombre apoderado:</string>
+    <string name="Nombre_apoderado">Nombre alumno:</string>
     <string name="Respuesta">Respuestas:</string>
     <string name="Comentarios">Comentarios:</string>
     <string name="pregunta_3">Motivacion:</string>
